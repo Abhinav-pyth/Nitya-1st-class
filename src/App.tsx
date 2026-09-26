@@ -7,13 +7,19 @@ import FloatingShapes from './components/FloatingShapes';
 import PageTransition from './components/PageTransition';
 import InteractiveCard from './components/InteractiveCard';
 import NumberLine from './components/NumberLine';
+import SnakeLadderGame from './components/SnakeLadderGame';
+import LudoGame from './components/LudoGame';
+import ThemeSwitcher from './components/ThemeSwitcher';
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { soundManager } from './utils/sounds';
 
-type Page = 'home' | 'subjects' | 'subject-detail' | 'quiz' | 'flashcards' | 'tools' | 'classroom';
+type Page = 'home' | 'subjects' | 'subject-detail' | 'quiz' | 'flashcards' | 'tools' | 'games' | 'snake-ladder' | 'ludo';
 
-export default function App() {
+function AppContent() {
+  const { themeConfig } = useTheme();
   const [page, setPage] = useState<Page>('home');
   const [score, setScore] = useState(0);
+  const [showThemeSwitcher, setShowThemeSwitcher] = useState(false);
 
   const celebrate = () => {
     confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
@@ -26,65 +32,97 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 relative">
+    <div className={`min-h-screen bg-gradient-to-br ${themeConfig.bgGradient} relative`}>
       {/* Interactive Background Elements */}
       <ParticleBackground />
       <FloatingShapes />
       <MagicCursor />
 
       {/* Navigation */}
-      <nav className="bg-white/90 backdrop-blur-lg shadow-lg sticky top-0 z-50 border-b-4 border-purple-200">
+      <nav className={`${themeConfig.navBg} backdrop-blur-lg shadow-lg sticky top-0 z-50 border-b-4 ${themeConfig.navBorder}`}>
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
           <button onClick={() => handlePageChange('home')} className="flex items-center gap-2 group">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center text-2xl shadow-md group-hover:scale-110 transition-transform">
+            <div className={`w-12 h-12 bg-gradient-to-br ${themeConfig.primaryGradient} rounded-xl flex items-center justify-center text-2xl shadow-md group-hover:scale-110 transition-transform`}>
               📚
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-lg font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className={`text-lg font-black bg-gradient-to-r ${themeConfig.primaryGradient} bg-clip-text text-transparent`}>
                 Learning Buddy
               </h1>
               <p className="text-xs text-gray-500">Class 1 • Interactive Learning</p>
             </div>
           </button>
           <div className="flex items-center gap-2">
-            <NavBtn active={page === 'home'} onClick={() => handlePageChange('home')} emoji="🏠" label="Home" />
-            <NavBtn active={page === 'subjects'} onClick={() => handlePageChange('subjects')} emoji="📚" label="Learn" />
-            <NavBtn active={page === 'quiz'} onClick={() => handlePageChange('quiz')} emoji="🎯" label="Quiz" />
-            <NavBtn active={page === 'flashcards'} onClick={() => handlePageChange('flashcards')} emoji="🎴" label="Cards" />
-            <NavBtn active={page === 'tools'} onClick={() => handlePageChange('tools')} emoji="🛠️" label="Tools" />
+            <NavBtn active={page === 'home'} onClick={() => handlePageChange('home')} emoji="🏠" label="Home" themeConfig={themeConfig} />
+            <NavBtn active={page === 'subjects'} onClick={() => handlePageChange('subjects')} emoji="📚" label="Learn" themeConfig={themeConfig} />
+            <NavBtn active={page === 'quiz'} onClick={() => handlePageChange('quiz')} emoji="🎯" label="Quiz" themeConfig={themeConfig} />
+            <NavBtn active={page === 'games'} onClick={() => handlePageChange('games')} emoji="🎮" label="Games" themeConfig={themeConfig} />
+            <button 
+              onClick={() => setShowThemeSwitcher(!showThemeSwitcher)}
+              className="p-2 rounded-xl hover:bg-gray-100 transition-all"
+              title="Change Theme"
+            >
+              🎨
+            </button>
           </div>
         </div>
       </nav>
 
+      {/* Theme Switcher Modal */}
+      {showThemeSwitcher && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowThemeSwitcher(false)}>
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+            <ThemeSwitcher />
+            <button 
+              onClick={() => setShowThemeSwitcher(false)}
+              className="w-full mt-4 py-3 bg-gray-100 rounded-xl font-bold"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 py-6 relative z-10">
         <PageTransition pageKey={page}>
-          {page === 'home' && <HomePage onNavigate={handlePageChange} celebrate={celebrate} />}
-          {page === 'subjects' && <SubjectsPage onNavigate={handlePageChange} />}
-          {page === 'subject-detail' && <SubjectDetailPage onBack={() => handlePageChange('subjects')} />}
-          {page === 'quiz' && <QuizPage score={score} setScore={setScore} celebrate={celebrate} />}
-          {page === 'flashcards' && <FlashcardsPage />}
-          {page === 'tools' && <ToolsPage />}
+          {page === 'home' && <HomePage onNavigate={handlePageChange} celebrate={celebrate} themeConfig={themeConfig} />}
+          {page === 'subjects' && <SubjectsPage onNavigate={handlePageChange} themeConfig={themeConfig} />}
+          {page === 'subject-detail' && <SubjectDetailPage onBack={() => handlePageChange('subjects')} themeConfig={themeConfig} />}
+          {page === 'quiz' && <QuizPage score={score} setScore={setScore} celebrate={celebrate} themeConfig={themeConfig} />}
+          {page === 'flashcards' && <FlashcardsPage themeConfig={themeConfig} />}
+          {page === 'tools' && <ToolsPage themeConfig={themeConfig} />}
+          {page === 'games' && <GamesPage onNavigate={handlePageChange} themeConfig={themeConfig} />}
+          {page === 'snake-ladder' && <SnakeLadderGame onBack={() => handlePageChange('games')} />}
+          {page === 'ludo' && <LudoGame onBack={() => handlePageChange('games')} />}
         </PageTransition>
       </main>
 
       {/* Score Display */}
-      <div className="fixed bottom-4 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-full shadow-lg font-black text-sm z-50">
+      <div className={`fixed bottom-4 right-4 bg-gradient-to-r ${themeConfig.buttonGradient} text-white px-4 py-2 rounded-full shadow-lg font-black text-sm z-50`}>
         ⭐ Score: {score}
       </div>
     </div>
   );
 }
 
+export default function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
+  );
+}
+
 // Navigation Button
-function NavBtn({ active, onClick, emoji, label }: { active: boolean; onClick: () => void; emoji: string; label: string }) {
+function NavBtn({ active, onClick, emoji, label, themeConfig }: { active: boolean; onClick: () => void; emoji: string; label: string; themeConfig: any }) {
   return (
     <button 
       onClick={onClick} 
       className={`px-3 py-2 rounded-xl text-sm font-bold transition-all ${
         active 
-          ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-md scale-105' 
-          : 'text-gray-600 hover:bg-purple-50'
+          ? `bg-gradient-to-r ${themeConfig.buttonGradient} text-white shadow-md scale-105` 
+          : 'text-gray-600 hover:bg-gray-100'
       }`}
     >
       <span className="mr-1">{emoji}</span>
@@ -94,31 +132,59 @@ function NavBtn({ active, onClick, emoji, label }: { active: boolean; onClick: (
 }
 
 // Home Page
-function HomePage({ onNavigate, celebrate }: { onNavigate: (page: Page) => void; celebrate: () => void }) {
+function HomePage({ onNavigate, celebrate, themeConfig }: { onNavigate: (page: Page) => void; celebrate: () => void; themeConfig: any }) {
   return (
     <div className="space-y-6">
       {/* 3D Interactive Mascot */}
-      <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl p-6 text-white shadow-2xl">
+      <div className={`bg-gradient-to-r ${themeConfig.primaryGradient} rounded-3xl p-6 text-white shadow-2xl`}>
         <h2 className="text-3xl font-black mb-2">Welcome Back! 🌟</h2>
         <p className="text-white/90 mb-4">Meet your learning buddy! Click and move your mouse to interact!</p>
         <InteractiveMascot />
       </div>
 
-      {/* Quick Actions */}
+      {/* Quick Actions - NOW CLICKABLE! */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <InteractiveCard className="bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl p-6 text-white shadow-lg">
+        <InteractiveCard 
+          onClick={() => {
+            soundManager.click();
+            sessionStorage.setItem('selectedSubject', 'Hindi');
+            onNavigate('subject-detail');
+          }}
+          className="bg-gradient-to-br from-orange-400 to-red-500 rounded-2xl p-6 text-white shadow-lg cursor-pointer"
+        >
           <div className="text-4xl mb-2">✏️</div>
           <div className="font-black">Hindi Writing</div>
         </InteractiveCard>
-        <InteractiveCard className="bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl p-6 text-white shadow-lg">
+        <InteractiveCard 
+          onClick={() => {
+            soundManager.click();
+            sessionStorage.setItem('selectedSubject', 'English');
+            onNavigate('subject-detail');
+          }}
+          className="bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl p-6 text-white shadow-lg cursor-pointer"
+        >
           <div className="text-4xl mb-2">📖</div>
           <div className="font-black">English</div>
         </InteractiveCard>
-        <InteractiveCard className="bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl p-6 text-white shadow-lg">
+        <InteractiveCard 
+          onClick={() => {
+            soundManager.click();
+            sessionStorage.setItem('selectedSubject', 'Maths');
+            onNavigate('subject-detail');
+          }}
+          className="bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl p-6 text-white shadow-lg cursor-pointer"
+        >
           <div className="text-4xl mb-2">🔢</div>
           <div className="font-black">Maths</div>
         </InteractiveCard>
-        <InteractiveCard className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-6 text-white shadow-lg">
+        <InteractiveCard 
+          onClick={() => {
+            soundManager.click();
+            sessionStorage.setItem('selectedSubject', 'EVS');
+            onNavigate('subject-detail');
+          }}
+          className="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-2xl p-6 text-white shadow-lg cursor-pointer"
+        >
           <div className="text-4xl mb-2">🌱</div>
           <div className="font-black">EVS</div>
         </InteractiveCard>
@@ -159,7 +225,7 @@ function HomePage({ onNavigate, celebrate }: { onNavigate: (page: Page) => void;
 }
 
 // Subjects Page
-function SubjectsPage({ onNavigate }: { onNavigate: (page: Page) => void }) {
+function SubjectsPage({ onNavigate, themeConfig }: { onNavigate: (page: Page) => void; themeConfig: any }) {
   const subjects = [
     { name: 'Hindi', emoji: '✏️', color: 'from-orange-400 to-red-500', lessons: 30 },
     { name: 'English', emoji: '📖', color: 'from-blue-400 to-cyan-500', lessons: 30 },
@@ -193,7 +259,7 @@ function SubjectsPage({ onNavigate }: { onNavigate: (page: Page) => void }) {
 }
 
 // Subject Detail Page
-function SubjectDetailPage({ onBack }: { onBack: () => void }) {
+function SubjectDetailPage({ onBack, themeConfig }: { onBack: () => void; themeConfig: any }) {
   const subjectName = sessionStorage.getItem('selectedSubject') || 'Hindi';
   
   const subjectData: Record<string, { emoji: string; color: string; lessons: { title: string; description: string; duration: string }[] }> = {
@@ -328,7 +394,7 @@ function SubjectDetailPage({ onBack }: { onBack: () => void }) {
 }
 
 // Quiz Page
-function QuizPage({ score, setScore, celebrate }: { score: number; setScore: (s: number) => void; celebrate: () => void }) {
+function QuizPage({ score, setScore, celebrate, themeConfig }: { score: number; setScore: (s: number) => void; celebrate: () => void; themeConfig: any }) {
   const [currentQ, setCurrentQ] = useState(0);
   const questions = [
     { q: 'अ से क्या होता है?', options: ['अनार', 'आम', 'इमली'], answer: 'अनार' },
@@ -375,7 +441,7 @@ function QuizPage({ score, setScore, celebrate }: { score: number; setScore: (s:
 }
 
 // Flashcards Page
-function FlashcardsPage() {
+function FlashcardsPage({ themeConfig }: { themeConfig: any }) {
   const [flipped, setFlipped] = useState(false);
   const cards = [
     { front: 'अ', back: 'अनार (Pomegranate)', emoji: '🍎' },
@@ -419,7 +485,7 @@ function FlashcardsPage() {
 }
 
 // Tools Page
-function ToolsPage() {
+function ToolsPage({ themeConfig }: { themeConfig: any }) {
   return (
     <div className="space-y-6">
       <h2 className="text-3xl font-black text-gray-800">🛠️ Learning Tools</h2>
@@ -439,6 +505,77 @@ function ToolsPage() {
           <h3 className="text-xl font-black text-gray-800 mb-2">Quiz Center</h3>
           <p className="text-sm text-gray-600">72+ questions with hints and explanations</p>
         </InteractiveCard>
+      </div>
+    </div>
+  );
+}
+
+// Games Page
+function GamesPage({ onNavigate, themeConfig }: { onNavigate: (page: Page) => void; themeConfig: any }) {
+  return (
+    <div className="space-y-6">
+      <h2 className="text-3xl font-black text-gray-800">🎮 Fun Games</h2>
+      <p className="text-gray-600">Take a break and play these fun learning games!</p>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Snake & Ladder */}
+        <InteractiveCard
+          onClick={() => {
+            soundManager.click();
+            onNavigate('snake-ladder');
+          }}
+          className="bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl p-8 text-white shadow-xl cursor-pointer"
+        >
+          <div className="text-6xl mb-4">🐍🪜</div>
+          <h3 className="text-2xl font-black mb-2">Snake & Ladder</h3>
+          <p className="text-white/90 mb-4">Roll the dice and climb to 100! Watch out for snakes!</p>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="bg-white/20 px-3 py-1 rounded-full">🎲 Dice Game</span>
+            <span className="bg-white/20 px-3 py-1 rounded-full">👤 1 Player</span>
+          </div>
+        </InteractiveCard>
+
+        {/* Ludo */}
+        <InteractiveCard
+          onClick={() => {
+            soundManager.click();
+            onNavigate('ludo');
+          }}
+          className="bg-gradient-to-br from-purple-400 to-pink-600 rounded-2xl p-8 text-white shadow-xl cursor-pointer"
+        >
+          <div className="text-6xl mb-4">🎲</div>
+          <h3 className="text-2xl font-black mb-2">Ludo Game</h3>
+          <p className="text-white/90 mb-4">Classic board game! Race your tokens to finish!</p>
+          <div className="flex items-center gap-2 text-sm">
+            <span className="bg-white/20 px-3 py-1 rounded-full">🎲 Board Game</span>
+            <span className="bg-white/20 px-3 py-1 rounded-full">👥 4 Players</span>
+          </div>
+        </InteractiveCard>
+      </div>
+
+      {/* Game Instructions */}
+      <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-purple-100">
+        <h3 className="text-xl font-black text-gray-800 mb-4">📖 How to Play</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h4 className="font-bold text-gray-700 mb-2">🐍 Snake & Ladder</h4>
+            <ul className="text-sm text-gray-600 space-y-1">
+              <li>• Roll the dice to move</li>
+              <li>• Land on a ladder to go up</li>
+              <li>• Land on a snake to go down</li>
+              <li>• First to reach 100 wins!</li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold text-gray-700 mb-2">🎲 Ludo</h4>
+            <ul className="text-sm text-gray-600 space-y-1">
+              <li>• Roll 6 to start</li>
+              <li>• Move your tokens around the board</li>
+              <li>• Roll 6 to get another turn</li>
+              <li>• First to finish all tokens wins!</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   );
