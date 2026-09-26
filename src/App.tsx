@@ -798,9 +798,14 @@ function ClassroomPage({ tab, setTab, state, openLesson }: { tab: 'stream' | 'cl
           <div className="bg-white rounded-2xl p-4 shadow-lg border-l-4 border-blue-400">
             <h3 className="font-black text-gray-800 mb-2">📅 Today's Schedule</h3>
             <div className="flex flex-wrap gap-2">
-              {(schedule[new Date().getDay() === 0 ? 5 : new Date().getDay() - 1]?.subjects || []).map((s, i) => (
-                <span key={i} className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold">{s}</span>
-              ))}
+              {(() => {
+                const dayIndex = new Date().getDay();
+                const idx = dayIndex === 0 ? 5 : dayIndex - 1;
+                const todaySchedule = schedule[idx] || schedule[0];
+                return (todaySchedule?.subjects || []).map((s, i) => (
+                  <span key={i} className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-bold">{s}</span>
+                ));
+              })()}
             </div>
           </div>
 
@@ -979,7 +984,7 @@ function SpeakPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-5 animate-slide-in">
       <div className="flex items-center gap-3">
-        <button onClick={() => window.history.back()} className="w-10 h-10 bg-white rounded-full shadow flex items-center justify-center hover:scale-110 transition">←</button>
+        <button onClick={() => { if (window.history.length > 1) window.history.back(); }} className="w-10 h-10 bg-white rounded-full shadow flex items-center justify-center hover:scale-110 transition">←</button>
         <h2 className="text-xl font-black text-gray-800">🗣️ Speak English Fun!</h2>
       </div>
       <div className="flex gap-2 overflow-x-auto pb-2">
@@ -1019,7 +1024,7 @@ function VocabularyPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-5 animate-slide-in">
       <div className="flex items-center gap-3">
-        <button onClick={() => window.history.back()} className="w-10 h-10 bg-white rounded-full shadow flex items-center justify-center hover:scale-110 transition">←</button>
+        <button onClick={() => { if (window.history.length > 1) window.history.back(); }} className="w-10 h-10 bg-white rounded-full shadow flex items-center justify-center hover:scale-110 transition">←</button>
         <h2 className="text-xl font-black text-gray-800">📖 Word Magic!</h2>
       </div>
       <div className="flex gap-2 overflow-x-auto pb-2">
