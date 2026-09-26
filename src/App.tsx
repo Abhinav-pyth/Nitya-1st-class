@@ -9,11 +9,16 @@ import InteractiveCard from './components/InteractiveCard';
 import NumberLine from './components/NumberLine';
 import SnakeLadderGame from './components/SnakeLadderGame';
 import LudoGame from './components/LudoGame';
+import MemoryGame from './components/MemoryGame';
+import WordBuilderGame from './components/WordBuilderGame';
+import MathRaceGame from './components/MathRaceGame';
+import PatternGame from './components/PatternGame';
+import SpellingBeeGame from './components/SpellingBeeGame';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { soundManager } from './utils/sounds';
 
-type Page = 'home' | 'subjects' | 'subject-detail' | 'quiz' | 'flashcards' | 'tools' | 'games' | 'snake-ladder' | 'ludo';
+type Page = 'home' | 'subjects' | 'subject-detail' | 'quiz' | 'flashcards' | 'tools' | 'games' | 'snake-ladder' | 'ludo' | 'memory' | 'word-builder' | 'math-race' | 'pattern' | 'spelling';
 
 function AppContent() {
   const { themeConfig } = useTheme();
@@ -95,6 +100,11 @@ function AppContent() {
           {page === 'games' && <GamesPage onNavigate={handlePageChange} themeConfig={themeConfig} />}
           {page === 'snake-ladder' && <SnakeLadderGame onBack={() => handlePageChange('games')} />}
           {page === 'ludo' && <LudoGame onBack={() => handlePageChange('games')} />}
+          {page === 'memory' && <MemoryGame onBack={() => handlePageChange('games')} />}
+          {page === 'word-builder' && <WordBuilderGame onBack={() => handlePageChange('games')} />}
+          {page === 'math-race' && <MathRaceGame onBack={() => handlePageChange('games')} />}
+          {page === 'pattern' && <PatternGame onBack={() => handlePageChange('games')} />}
+          {page === 'spelling' && <SpellingBeeGame onBack={() => handlePageChange('games')} />}
         </PageTransition>
       </main>
 
@@ -512,68 +522,150 @@ function ToolsPage({ themeConfig }: { themeConfig: any }) {
 
 // Games Page
 function GamesPage({ onNavigate, themeConfig }: { onNavigate: (page: Page) => void; themeConfig: any }) {
+  const games = [
+    {
+      id: 'snake-ladder',
+      title: 'Snake & Ladder',
+      emoji: '🐍🪜',
+      description: 'Roll the dice and climb to 100! Watch out for snakes!',
+      gradient: 'from-green-400 to-emerald-600',
+      tags: ['🎲 Dice', '👤 1 Player'],
+      category: 'Classic',
+    },
+    {
+      id: 'ludo',
+      title: 'Ludo Game',
+      emoji: '🎲',
+      description: 'Classic board game! Race your tokens to finish!',
+      gradient: 'from-purple-400 to-pink-600',
+      tags: ['🎲 Board', '👥 4 Players'],
+      category: 'Classic',
+    },
+    {
+      id: 'memory',
+      title: 'Memory Match',
+      emoji: '🧠',
+      description: 'Find all matching pairs! Train your memory!',
+      gradient: 'from-blue-400 to-indigo-600',
+      tags: ['🧩 Puzzle', '👤 1 Player'],
+      category: 'Brain',
+    },
+    {
+      id: 'word-builder',
+      title: 'Word Builder',
+      emoji: '🔤',
+      description: 'Build words with letters! Learn spelling!',
+      gradient: 'from-orange-400 to-red-600',
+      tags: ['📚 Learning', '👤 1 Player'],
+      category: 'Educational',
+    },
+    {
+      id: 'math-race',
+      title: 'Math Race',
+      emoji: '⚡',
+      description: 'Solve math problems fast! Beat the clock!',
+      gradient: 'from-yellow-400 to-orange-600',
+      tags: ['🔢 Math', '⏱️ Timed'],
+      category: 'Educational',
+    },
+    {
+      id: 'pattern',
+      title: 'Pattern Game',
+      emoji: '🎨',
+      description: 'Complete the pattern! Train your logic!',
+      gradient: 'from-pink-400 to-rose-600',
+      tags: ['🧩 Logic', '👤 1 Player'],
+      category: 'Brain',
+    },
+    {
+      id: 'spelling',
+      title: 'Spelling Bee',
+      emoji: '🐝',
+      description: 'Spell the words correctly! Learn new words!',
+      gradient: 'from-cyan-400 to-blue-600',
+      tags: ['📚 Learning', '🔊 Audio'],
+      category: 'Educational',
+    },
+  ];
+
+  const categories = ['All', 'Classic', 'Educational', 'Brain'];
+  const [selectedCategory, setSelectedCategory] = useState('All');
+
+  const filteredGames = selectedCategory === 'All' 
+    ? games 
+    : games.filter(g => g.category === selectedCategory);
+
   return (
     <div className="space-y-6">
-      <h2 className="text-3xl font-black text-gray-800">🎮 Fun Games</h2>
-      <p className="text-gray-600">Take a break and play these fun learning games!</p>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Snake & Ladder */}
-        <InteractiveCard
-          onClick={() => {
-            soundManager.click();
-            onNavigate('snake-ladder');
-          }}
-          className="bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl p-8 text-white shadow-xl cursor-pointer"
-        >
-          <div className="text-6xl mb-4">🐍🪜</div>
-          <h3 className="text-2xl font-black mb-2">Snake & Ladder</h3>
-          <p className="text-white/90 mb-4">Roll the dice and climb to 100! Watch out for snakes!</p>
-          <div className="flex items-center gap-2 text-sm">
-            <span className="bg-white/20 px-3 py-1 rounded-full">🎲 Dice Game</span>
-            <span className="bg-white/20 px-3 py-1 rounded-full">👤 1 Player</span>
-          </div>
-        </InteractiveCard>
-
-        {/* Ludo */}
-        <InteractiveCard
-          onClick={() => {
-            soundManager.click();
-            onNavigate('ludo');
-          }}
-          className="bg-gradient-to-br from-purple-400 to-pink-600 rounded-2xl p-8 text-white shadow-xl cursor-pointer"
-        >
-          <div className="text-6xl mb-4">🎲</div>
-          <h3 className="text-2xl font-black mb-2">Ludo Game</h3>
-          <p className="text-white/90 mb-4">Classic board game! Race your tokens to finish!</p>
-          <div className="flex items-center gap-2 text-sm">
-            <span className="bg-white/20 px-3 py-1 rounded-full">🎲 Board Game</span>
-            <span className="bg-white/20 px-3 py-1 rounded-full">👥 4 Players</span>
-          </div>
-        </InteractiveCard>
+      {/* Header */}
+      <div className="bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 rounded-3xl p-8 text-white shadow-2xl">
+        <h2 className="text-4xl font-black mb-2">🎮 Game Arcade</h2>
+        <p className="text-white/90 text-lg">Learn and play with {games.length} exciting games!</p>
       </div>
 
-      {/* Game Instructions */}
-      <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-purple-100">
-        <h3 className="text-xl font-black text-gray-800 mb-4">📖 How to Play</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h4 className="font-bold text-gray-700 mb-2">🐍 Snake & Ladder</h4>
-            <ul className="text-sm text-gray-600 space-y-1">
-              <li>• Roll the dice to move</li>
-              <li>• Land on a ladder to go up</li>
-              <li>• Land on a snake to go down</li>
-              <li>• First to reach 100 wins!</li>
-            </ul>
+      {/* Category Filter */}
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        {categories.map(cat => (
+          <button
+            key={cat}
+            onClick={() => setSelectedCategory(cat)}
+            className={`px-6 py-2 rounded-full font-bold whitespace-nowrap transition-all ${
+              selectedCategory === cat
+                ? `bg-gradient-to-r ${themeConfig.buttonGradient} text-white shadow-lg scale-105`
+                : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Games Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredGames.map((game) => (
+          <InteractiveCard
+            key={game.id}
+            onClick={() => {
+              soundManager.click();
+              onNavigate(game.id as Page);
+            }}
+            className={`bg-gradient-to-br ${game.gradient} rounded-3xl p-6 text-white shadow-xl cursor-pointer group hover:scale-105 transition-all`}
+          >
+            <div className="flex items-start justify-between mb-4">
+              <div className="text-5xl group-hover:scale-110 transition-transform">{game.emoji}</div>
+              <span className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold">{game.category}</span>
+            </div>
+            <h3 className="text-2xl font-black mb-2">{game.title}</h3>
+            <p className="text-white/90 mb-4 text-sm">{game.description}</p>
+            <div className="flex flex-wrap gap-2">
+              {game.tags.map((tag, i) => (
+                <span key={i} className="bg-white/20 px-3 py-1 rounded-full text-xs font-bold">
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </InteractiveCard>
+        ))}
+      </div>
+
+      {/* Learning Benefits */}
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl p-6 shadow-lg border-2 border-blue-100">
+        <h3 className="text-xl font-black text-gray-800 mb-4">🎓 Learning Benefits</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-white rounded-2xl p-4">
+            <div className="text-3xl mb-2">🧠</div>
+            <h4 className="font-bold text-gray-700 mb-1">Brain Training</h4>
+            <p className="text-sm text-gray-600">Memory, logic, and pattern recognition games</p>
           </div>
-          <div>
-            <h4 className="font-bold text-gray-700 mb-2">🎲 Ludo</h4>
-            <ul className="text-sm text-gray-600 space-y-1">
-              <li>• Roll 6 to start</li>
-              <li>• Move your tokens around the board</li>
-              <li>• Roll 6 to get another turn</li>
-              <li>• First to finish all tokens wins!</li>
-            </ul>
+          <div className="bg-white rounded-2xl p-4">
+            <div className="text-3xl mb-2">📚</div>
+            <h4 className="font-bold text-gray-700 mb-1">Language Skills</h4>
+            <p className="text-sm text-gray-600">Word building and spelling practice</p>
+          </div>
+          <div className="bg-white rounded-2xl p-4">
+            <div className="text-3xl mb-2">🔢</div>
+            <h4 className="font-bold text-gray-700 mb-1">Math Mastery</h4>
+            <p className="text-sm text-gray-600">Speed math and calculation practice</p>
           </div>
         </div>
       </div>

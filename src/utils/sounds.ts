@@ -49,6 +49,12 @@ class SoundManager {
     });
   }
 
+  startQuiz() {
+    this.playTone(440, 0.1, 'sine');
+    setTimeout(() => this.playTone(554.37, 0.1, 'sine'), 100);
+    setTimeout(() => this.playTone(659.25, 0.15, 'sine'), 200);
+  }
+
   levelUp() {
     const notes = [392, 440, 494, 523, 587, 659, 740, 784];
     notes.forEach((note, i) => {
