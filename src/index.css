@@ -1,1 +1,23 @@
 @import "tailwindcss";
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Hindi/Devanagari font support */
+  .font-serif {
+    font-family: 'Noto Sans Devanagari', 'Mangal', serif;
+  }
+}
+
+@layer utilities {
+  .touch-none {
+    touch-action: none;
+  }
+}
