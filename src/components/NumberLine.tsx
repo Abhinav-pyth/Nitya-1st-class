@@ -12,6 +12,21 @@ export default function NumberLine({ start = 0, end = 20, onNumberClick }: Numbe
   const [activeNumbers, setActiveNumbers] = useState<number[]>([]);
   const numbersRef = useRef<(HTMLDivElement | null)[]>([]);
 
+  const handleReset = () => {
+    // Animate all numbers back to default
+    numbersRef.current.forEach((element) => {
+      if (element) {
+        gsap.to(element, {
+          scale: 1,
+          backgroundColor: '#ffffff',
+          duration: 0.3,
+          ease: 'back.out(1.7)',
+        });
+      }
+    });
+    setActiveNumbers([]);
+  };
+
   const handleNumberClick = (num: number, index: number) => {
     const element = numbersRef.current[index];
     if (!element) return;
@@ -87,9 +102,19 @@ export default function NumberLine({ start = 0, end = 20, onNumberClick }: Numbe
         </div>
       )}
 
-      {/* Instructions */}
-      <div className="mt-4 text-sm text-gray-500 text-center">
-        💡 Click numbers to select them. Try adding them up!
+      {/* Instructions and Reset Button */}
+      <div className="mt-4 flex items-center justify-between">
+        <div className="text-sm text-gray-500">
+          💡 Click numbers to select them. Try adding them up!
+        </div>
+        {activeNumbers.length > 0 && (
+          <button
+            onClick={handleReset}
+            className="px-4 py-2 bg-gradient-to-r from-red-400 to-pink-500 text-white rounded-lg font-bold text-sm hover:scale-105 transition-transform shadow-md"
+          >
+            🔄 Reset
+          </button>
+        )}
       </div>
     </div>
   );

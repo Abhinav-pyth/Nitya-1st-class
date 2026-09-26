@@ -9,7 +9,7 @@ import InteractiveCard from './components/InteractiveCard';
 import NumberLine from './components/NumberLine';
 import { soundManager } from './utils/sounds';
 
-type Page = 'home' | 'subjects' | 'quiz' | 'flashcards' | 'tools' | 'classroom';
+type Page = 'home' | 'subjects' | 'subject-detail' | 'quiz' | 'flashcards' | 'tools' | 'classroom';
 
 export default function App() {
   const [page, setPage] = useState<Page>('home');
@@ -60,7 +60,8 @@ export default function App() {
       <main className="max-w-7xl mx-auto px-4 py-6 relative z-10">
         <PageTransition pageKey={page}>
           {page === 'home' && <HomePage onNavigate={handlePageChange} celebrate={celebrate} />}
-          {page === 'subjects' && <SubjectsPage />}
+          {page === 'subjects' && <SubjectsPage onNavigate={handlePageChange} />}
+          {page === 'subject-detail' && <SubjectDetailPage onBack={() => handlePageChange('subjects')} />}
           {page === 'quiz' && <QuizPage score={score} setScore={setScore} celebrate={celebrate} />}
           {page === 'flashcards' && <FlashcardsPage />}
           {page === 'tools' && <ToolsPage />}
@@ -158,7 +159,7 @@ function HomePage({ onNavigate, celebrate }: { onNavigate: (page: Page) => void;
 }
 
 // Subjects Page
-function SubjectsPage() {
+function SubjectsPage({ onNavigate }: { onNavigate: (page: Page) => void }) {
   const subjects = [
     { name: 'Hindi', emoji: '✏️', color: 'from-orange-400 to-red-500', lessons: 30 },
     { name: 'English', emoji: '📖', color: 'from-blue-400 to-cyan-500', lessons: 30 },
@@ -173,13 +174,154 @@ function SubjectsPage() {
         {subjects.map((subject) => (
           <InteractiveCard 
             key={subject.name}
-            className={`bg-gradient-to-br ${subject.color} rounded-2xl p-6 text-white shadow-lg`}
+            onClick={() => {
+              soundManager.click();
+              // Store selected subject in sessionStorage
+              sessionStorage.setItem('selectedSubject', subject.name);
+              onNavigate('subject-detail');
+            }}
+            className={`bg-gradient-to-br ${subject.color} rounded-2xl p-6 text-white shadow-lg cursor-pointer`}
           >
             <div className="text-6xl mb-3">{subject.emoji}</div>
             <h3 className="text-2xl font-black mb-2">{subject.name}</h3>
             <p className="text-white/90">{subject.lessons} lessons available</p>
           </InteractiveCard>
         ))}
+      </div>
+    </div>
+  );
+}
+
+// Subject Detail Page
+function SubjectDetailPage({ onBack }: { onBack: () => void }) {
+  const subjectName = sessionStorage.getItem('selectedSubject') || 'Hindi';
+  
+  const subjectData: Record<string, { emoji: string; color: string; lessons: { title: string; description: string; duration: string }[] }> = {
+    Hindi: {
+      emoji: '✏️',
+      color: 'from-orange-400 to-red-500',
+      lessons: [
+        { title: 'स्वर (Vowels)', description: 'Learn अ, आ, इ, ई, उ, ऊ', duration: '15 min' },
+        { title: 'व्यंजन (Consonants)', description: 'Learn क, ख, ग, घ and more', duration: '20 min' },
+        { title: 'मात्रा (Matras)', description: 'Practice आ की, इ की, ई की मात्रा', duration: '25 min' },
+        { title: 'शब्द (Words)', description: 'Build 2-letter and 3-letter words', duration: '20 min' },
+        { title: 'वाक्य (Sentences)', description: 'Make simple Hindi sentences', duration: '25 min' },
+      ]
+    },
+    English: {
+      emoji: '📖',
+      color: 'from-blue-400 to-cyan-500',
+      lessons: [
+        { title: 'Alphabet A-M', description: 'Capital and small letters', duration: '15 min' },
+        { title: 'Alphabet N-Z', description: 'Complete the alphabet', duration: '15 min' },
+        { title: 'Vowel Sounds', description: 'Learn a, e, i, o, u sounds', duration: '10 min' },
+        { title: 'My Family', description: 'Father, Mother, Brother, Sister', duration: '15 min' },
+        { title: 'Animals', description: 'Domestic and wild animals', duration: '20 min' },
+      ]
+    },
+    Maths: {
+      emoji: '🔢',
+      color: 'from-green-400 to-emerald-500',
+      lessons: [
+        { title: 'Numbers 1-10', description: 'Count and recognize numbers', duration: '15 min' },
+        { title: 'Numbers 11-20', description: 'Continue counting', duration: '15 min' },
+        { title: 'Addition', description: 'Learn to add numbers', duration: '20 min' },
+        { title: 'Subtraction', description: 'Learn to subtract numbers', duration: '20 min' },
+        { title: 'Shapes', description: 'Circle, Square, Triangle, Rectangle', duration: '15 min' },
+      ]
+    },
+    EVS: {
+      emoji: '🌱',
+      color: 'from-yellow-400 to-orange-500',
+      lessons: [
+        { title: 'My Body', description: 'Learn about body parts', duration: '15 min' },
+        { title: 'Five Senses', description: 'Eyes, Ears, Nose, Tongue, Skin', duration: '15 min' },
+        { title: 'Plants', description: 'Parts of a plant', duration: '20 min' },
+        { title: 'Animals', description: 'Domestic and wild animals', duration: '20 min' },
+        { title: 'Good Habits', description: 'Healthy daily habits', duration: '15 min' },
+      ]
+    }
+  };
+
+  const subject = subjectData[subjectName] || subjectData.Hindi;
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <button 
+          onClick={onBack}
+          className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
+        >
+          ←
+        </button>
+        <div className={`bg-gradient-to-r ${subject.color} rounded-2xl p-4 text-white shadow-lg flex-1`}>
+          <div className="flex items-center gap-3">
+            <span className="text-5xl">{subject.emoji}</span>
+            <div>
+              <h2 className="text-2xl font-black">{subjectName}</h2>
+              <p className="text-white/90 text-sm">{subject.lessons.length} lessons available</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Lessons List */}
+      <div className="space-y-4">
+        <h3 className="text-xl font-black text-gray-800">📚 Lessons</h3>
+        {subject.lessons.map((lesson, index) => (
+          <InteractiveCard
+            key={index}
+            onClick={() => {
+              soundManager.click();
+              // Future: Navigate to lesson detail
+            }}
+            className="bg-white rounded-2xl p-5 shadow-lg border-2 border-gray-100 hover:border-purple-300 cursor-pointer"
+          >
+            <div className="flex items-start gap-4">
+              <div className={`w-12 h-12 bg-gradient-to-br ${subject.color} rounded-xl flex items-center justify-center text-white font-black text-lg`}>
+                {index + 1}
+              </div>
+              <div className="flex-1">
+                <h4 className="text-lg font-black text-gray-800 mb-1">{lesson.title}</h4>
+                <p className="text-sm text-gray-600 mb-2">{lesson.description}</p>
+                <div className="flex items-center gap-2 text-xs text-gray-500">
+                  <span>⏱️ {lesson.duration}</span>
+                  <span>•</span>
+                  <span>📖 Interactive</span>
+                </div>
+              </div>
+              <div className="text-2xl">→</div>
+            </div>
+          </InteractiveCard>
+        ))}
+      </div>
+
+      {/* Quick Actions */}
+      <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-100">
+        <h3 className="text-lg font-black text-gray-800 mb-4">🎯 Quick Practice</h3>
+        <div className="grid grid-cols-2 gap-3">
+          <InteractiveCard
+            onClick={() => {
+              soundManager.click();
+              // Future: Open quiz for this subject
+            }}
+            className="bg-white rounded-xl p-4 text-center shadow-md cursor-pointer"
+          >
+            <div className="text-3xl mb-2">🎯</div>
+            <div className="font-bold text-sm">Take Quiz</div>
+          </InteractiveCard>
+          <InteractiveCard
+            onClick={() => {
+              soundManager.click();
+              // Future: Open flashcards for this subject
+            }}
+            className="bg-white rounded-xl p-4 text-center shadow-md cursor-pointer"
+          >
+            <div className="text-3xl mb-2">🎴</div>
+            <div className="font-bold text-sm">Flashcards</div>
+          </InteractiveCard>
+        </div>
       </div>
     </div>
   );
