@@ -23,6 +23,7 @@ export default function PatternGame({ onBack }: PatternGameProps) {
   const [currentPattern, setCurrentPattern] = useState<Pattern | null>(null);
   const [message, setMessage] = useState('');
   const [gameComplete, setGameComplete] = useState(false);
+  const [answered, setAnswered] = useState(false);
 
   useEffect(() => {
     generatePattern();
@@ -32,22 +33,25 @@ export default function PatternGame({ onBack }: PatternGameProps) {
     const patternLength = Math.min(3 + level, 6);
     const colorsUsed = Math.min(2 + Math.floor(level / 2), COLORS.length);
     const selectedColors = COLORS.slice(0, colorsUsed);
-    
+
     // Create a repeating pattern
     const basePattern = [];
     for (let i = 0; i < patternLength; i++) {
       basePattern.push(selectedColors[Math.floor(Math.random() * selectedColors.length)]);
     }
-    
-    // Repeat the pattern
+
+    // Repeat the pattern so it is recognizable.
     const sequence = [...basePattern, ...basePattern];
-    const missing = Math.floor(Math.random() * sequence.length);
+    // Always ask for the NEXT item (end of the sequence) — that matches the
+    // "What comes next?" question and stays unambiguous even when the base
+    // pattern happens to be symmetric.
+    const missing = sequence.length - 1;
     const answer = sequence[missing];
-    
+
     // Generate options
     const options = new Set<string>([answer]);
     while (options.size < 4) {
-      options.add(selectedColors[Math.floor(Math.random() * selectedColors.length)]);
+      options.add(COLORS[Math.floor(Math.random() * COLORS.length)]);
     }
 
     setCurrentPattern({
@@ -57,12 +61,14 @@ export default function PatternGame({ onBack }: PatternGameProps) {
       answer,
     });
     setMessage('');
+    setAnswered(false);
   };
 
   const handleAnswer = (selected: string) => {
-    if (!currentPattern) return;
+    if (!currentPattern || answered) return;
 
     if (selected === currentPattern.answer) {
+      setAnswered(true);
       soundManager.correct();
       setMessage('🎉 Correct!');
       setScore(s => s + 10);

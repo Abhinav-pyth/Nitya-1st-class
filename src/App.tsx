@@ -26,6 +26,18 @@ function AppContent() {
   const [score, setScore] = useState(0);
   const [showThemeSwitcher, setShowThemeSwitcher] = useState(false);
 
+  // Unlock Web Audio on the first user gesture (required by mobile browsers,
+  // otherwise all game sounds stay silent).
+  useEffect(() => {
+    const unlock = () => soundManager.unlock();
+    window.addEventListener('pointerdown', unlock, { once: true });
+    window.addEventListener('keydown', unlock, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', unlock);
+      window.removeEventListener('keydown', unlock);
+    };
+  }, []);
+
   const celebrate = () => {
     confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     soundManager.celebrate();
@@ -34,6 +46,7 @@ function AppContent() {
   const handlePageChange = (newPage: Page) => {
     soundManager.click();
     setPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (

@@ -2,29 +2,50 @@
 class SoundManager {
   private audioContext: AudioContext | null = null;
 
-  constructor() {
-    if (typeof window !== 'undefined') {
-      this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+  // Lazily create/resume the AudioContext. Browsers (especially mobile) block
+  // audio until it is created or resumed from a user gesture — creating it in
+  // the constructor left it permanently "suspended" on phones, so no game
+  // sounds played at all.
+  private ensureContext(): AudioContext | null {
+    if (typeof window === 'undefined') return null;
+    try {
+      if (!this.audioContext) {
+        const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+        if (!Ctx) return null;
+        this.audioContext = new Ctx();
+      }
+      if (this.audioContext.state === 'suspended') {
+        this.audioContext.resume().catch(() => {});
+      }
+      return this.audioContext;
+    } catch {
+      return null;
     }
   }
 
+  // Call once from a user gesture (e.g. first tap/click) to unlock audio on mobile.
+  unlock() {
+    this.ensureContext();
+  }
+
   private playTone(frequency: number, duration: number, type: OscillatorType = 'sine') {
-    if (!this.audioContext) return;
-    
-    const oscillator = this.audioContext.createOscillator();
-    const gainNode = this.audioContext.createGain();
-    
+    const ctx = this.ensureContext();
+    if (!ctx) return;
+
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+
     oscillator.connect(gainNode);
-    gainNode.connect(this.audioContext.destination);
-    
+    gainNode.connect(ctx.destination);
+
     oscillator.frequency.value = frequency;
     oscillator.type = type;
-    
-    gainNode.gain.setValueAtTime(0.3, this.audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
-    
-    oscillator.start(this.audioContext.currentTime);
-    oscillator.stop(this.audioContext.currentTime + duration);
+
+    gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+
+    oscillator.start(ctx.currentTime);
+    oscillator.stop(ctx.currentTime + duration);
   }
 
   correct() {
@@ -43,7 +64,7 @@ class SoundManager {
   }
 
   celebrate() {
-    const notes = [523.25, 659.25, 783.99, 1046.50];
+    const notes = [523.25, 659.25, 783.99, 1046.5];
     notes.forEach((note, i) => {
       setTimeout(() => this.playTone(note, 0.15, 'sine'), i * 100);
     });

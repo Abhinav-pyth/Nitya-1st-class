@@ -7,8 +7,10 @@ export default function MagicCursor() {
   const animationRef = useRef<number>();
 
   useEffect(() => {
-    // Only show on desktop
-    if (window.innerWidth < 768) return;
+    // Only show on desktop with a real pointer (no touch devices).
+    const hasFinePointer =
+      typeof window.matchMedia === 'function' ? window.matchMedia('(pointer: fine)').matches : true;
+    if (window.innerWidth < 768 || !hasFinePointer) return;
 
     const trailCount = 8;
     const trail: HTMLDivElement[] = [];

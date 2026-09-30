@@ -28,6 +28,7 @@ export default function MathRaceGame({ onBack }: MathRaceGameProps) {
   const [currentProblem, setCurrentProblem] = useState<Problem | null>(null);
   const [feedback, setFeedback] = useState<'correct' | 'wrong' | null>(null);
   const [level, setLevel] = useState(1);
+  const [answering, setAnswering] = useState(false);
 
   const generateProblem = (): Problem => {
     const operations: Operation[] = level >= 3 ? ['+', '-', '×'] : level >= 2 ? ['+', '-'] : ['+'];
@@ -97,19 +98,22 @@ export default function MathRaceGame({ onBack }: MathRaceGameProps) {
     setGameOver(false);
     setIsPlaying(true);
     setLevel(1);
+    setAnswering(false);
+    setFeedback(null);
     setCurrentProblem(generateProblem());
     soundManager.startQuiz();
   };
 
   const handleAnswer = (selectedAnswer: number) => {
-    if (!currentProblem || !isPlaying) return;
+    if (!currentProblem || !isPlaying || answering || gameOver) return;
+    setAnswering(true);
 
     if (selectedAnswer === currentProblem.answer) {
       soundManager.correct();
       const newStreak = streak + 1;
       setStreak(newStreak);
       if (newStreak > bestStreak) setBestStreak(newStreak);
-      
+
       // Bonus points for streaks
       const points = newStreak >= 5 ? 5 : newStreak >= 3 ? 3 : 1;
       setScore(s => s + points);
@@ -127,8 +131,9 @@ export default function MathRaceGame({ onBack }: MathRaceGameProps) {
 
     setTimeout(() => {
       setFeedback(null);
-      setCurrentProblem(generateProblem());
-    }, 500);
+      setAnswering(false);
+      if (!gameOver) setCurrentProblem(generateProblem());
+    }, 400);
   };
 
   if (!isPlaying && !gameOver) {
@@ -227,11 +232,11 @@ export default function MathRaceGame({ onBack }: MathRaceGameProps) {
 
       {/* Problem */}
       {currentProblem && (
-        <div className={`bg-white rounded-3xl p-8 shadow-xl transition-all ${
+        <div className={`bg-white rounded-3xl p-4 sm:p-8 shadow-xl transition-all ${
           feedback === 'correct' ? 'ring-4 ring-green-500' : feedback === 'wrong' ? 'ring-4 ring-red-500' : ''
         }`}>
-          <div className="text-center mb-8">
-            <div className="text-5xl md:text-6xl font-black text-gray-800">
+          <div className="text-center mb-6 sm:mb-8">
+            <div className="text-4xl sm:text-5xl md:text-6xl font-black text-gray-800 break-words">
               {currentProblem.num1} {currentProblem.operation} {currentProblem.num2} = ?
             </div>
           </div>
@@ -241,7 +246,8 @@ export default function MathRaceGame({ onBack }: MathRaceGameProps) {
               <button
                 key={index}
                 onClick={() => handleAnswer(option)}
-                className="py-6 bg-gradient-to-br from-blue-400 to-cyan-500 text-white rounded-2xl text-3xl font-black shadow-lg kid-btn hover:scale-105"
+                disabled={answering}
+                className="py-5 sm:py-6 bg-gradient-to-br from-blue-400 to-cyan-500 text-white rounded-2xl text-2xl sm:text-3xl font-black shadow-lg kid-btn active:scale-95 disabled:opacity-70"
               >
                 {option}
               </button>
