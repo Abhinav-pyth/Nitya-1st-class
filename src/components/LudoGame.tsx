@@ -16,16 +16,21 @@ const FINISH_AT = TRACK_LENGTH + HOME_STRETCH; // pos === FINISH_AT - 1 == token
 const START_OFFSET: Record<PlayerColor, number> = { red: 0, green: 10, yellow: 20, blue: 30 };
 
 // The 52 cells of the classic cross path, listed clockwise starting at red's start.
+// Board is a 15x15 grid; arms occupy rows/cols 6-8, bases fill the corners.
 const CROSS_CELLS: [number, number][] = (() => {
   const c: [number, number][] = [];
-  for (let r = 5; r <= 10; r++) c.push([r, 0]);
-  for (let col = 1; col <= 5; col++) c.push([5, col]);
-  for (let r = 4; r >= 0; r--) c.push([r, 6]);
-  for (let row = 1; row <= 5; row++) c.push([row, 11]);
-  for (let r = 6; r <= 11; r++) c.push([r, 12]);
-  for (let col = 11; col >= 7; col--) c.push([13, col]);
-  for (let row = 8; row >= 6; row--) c.push([row, 5]);
-  for (let col = 6; col >= 0; col--) c.push([14, col]);
+  // Clockwise loop of all 52 shared-track cells, starting at red's entry [6,6].
+  for (let r = 6; r >= 0; r--) c.push([r, 6]);            // 7: up the left arm top edge
+  for (let col = 7; col <= 8; col++) c.push([0, col]);    // 2: across the very top
+  for (let r = 1; r <= 6; r++) c.push([r, 8]);            // 6: down into the top-arm center lane
+  for (let row = 6; row <= 8; row++) c.push([row, 9]);    // 3: corner turn right
+  for (let col = 10; col <= 14; col++) c.push([6, col]);  // 5: across the right arm top edge
+  for (let r = 7; r <= 8; r++) c.push([r, 14]);           // 2: down the far-right edge
+  for (let col = 13; col >= 10; col--) c.push([8, col]);  // 4: back left along the bottom edge
+  for (let row = 6; row <= 8; row++) c.push([8, row]);    // 3: corner turn down (center lane)
+  for (let r = 9; r <= 14; r++) c.push([r, 7]);           // 6: down the bottom arm center lane
+  for (let col = 6; col >= 0; col--) c.push([14, col]);   // 7: across the very bottom to the left
+  for (let r = 13; r >= 8; r--) c.push([r, 0]);           // 6: up the far-left edge back toward start
   return c; // length = 52
 })();
 
