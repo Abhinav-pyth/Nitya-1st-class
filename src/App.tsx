@@ -16,6 +16,8 @@ import PatternGame from './components/PatternGame';
 import SpellingBeeGame from './components/SpellingBeeGame';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import LessonModal from './components/LessonModal';
+import LessonPlayer, { SimpleLesson } from './components/LessonPlayer';
+import { getLessonsBySubject } from "./utils/store";
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { soundManager } from './utils/sounds';
 
@@ -285,55 +287,21 @@ function SubjectsPage({ onNavigate, themeConfig }: { onNavigate: (page: Page) =>
 // Subject Detail Page
 function SubjectDetailPage({ onBack, onQuickAction, themeConfig }: { onBack: () => void; onQuickAction: (page: Page) => void; themeConfig: any }) {
   const subjectName = sessionStorage.getItem('selectedSubject') || 'Hindi';
-  
-  const subjectData: Record<string, { emoji: string; color: string; lessons: { title: string; description: string; duration: string }[] }> = {
-    Hindi: {
-      emoji: '✏️',
-      color: 'from-orange-400 to-red-500',
-      lessons: [
-        { title: 'स्वर (Vowels)', description: 'Learn अ, आ, इ, ई, उ, ऊ', duration: '15 min' },
-        { title: 'व्यंजन (Consonants)', description: 'Learn क, ख, ग, घ and more', duration: '20 min' },
-        { title: 'मात्रा (Matras)', description: 'Practice आ की, इ की, ई की मात्रा', duration: '25 min' },
-        { title: 'शब्द (Words)', description: 'Build 2-letter and 3-letter words', duration: '20 min' },
-        { title: 'वाक्य (Sentences)', description: 'Make simple Hindi sentences', duration: '25 min' },
-      ]
-    },
-    English: {
-      emoji: '📖',
-      color: 'from-blue-400 to-cyan-500',
-      lessons: [
-        { title: 'Alphabet A-M', description: 'Capital and small letters', duration: '15 min' },
-        { title: 'Alphabet N-Z', description: 'Complete the alphabet', duration: '15 min' },
-        { title: 'Vowel Sounds', description: 'Learn a, e, i, o, u sounds', duration: '10 min' },
-        { title: 'My Family', description: 'Father, Mother, Brother, Sister', duration: '15 min' },
-        { title: 'Animals', description: 'Domestic and wild animals', duration: '20 min' },
-      ]
-    },
-    Maths: {
-      emoji: '🔢',
-      color: 'from-green-400 to-emerald-500',
-      lessons: [
-        { title: 'Numbers 1-10', description: 'Count and recognize numbers', duration: '15 min' },
-        { title: 'Numbers 11-20', description: 'Continue counting', duration: '15 min' },
-        { title: 'Addition', description: 'Learn to add numbers', duration: '20 min' },
-        { title: 'Subtraction', description: 'Learn to subtract numbers', duration: '20 min' },
-        { title: 'Shapes', description: 'Circle, Square, Triangle, Rectangle', duration: '15 min' },
-      ]
-    },
-    EVS: {
-      emoji: '🌱',
-      color: 'from-yellow-400 to-orange-500',
-      lessons: [
-        { title: 'My Body', description: 'Learn about body parts', duration: '15 min' },
-        { title: 'Five Senses', description: 'Eyes, Ears, Nose, Tongue, Skin', duration: '15 min' },
-        { title: 'Plants', description: 'Parts of a plant', duration: '20 min' },
-        { title: 'Animals', description: 'Domestic and wild animals', duration: '20 min' },
-        { title: 'Good Habits', description: 'Healthy daily habits', duration: '15 min' },
-      ]
-    }
-  };
 
-  const subject = subjectData[subjectName] || subjectData.Hindi;
+  // Real interactive lesson content from the data files (fully playable — no placeholders)
+  const subjectMeta: Record<string, { emoji: string; color: string; key: any }> = {
+    Hindi:   { emoji: '✏️', color: 'from-orange-400 to-red-500', key: 'hindi' },
+    English: { emoji: '📖', color: 'from-blue-400 to-cyan-500', key: 'english' },
+    Maths:   { emoji: '🔢', color: 'from-green-400 to-emerald-500', key: 'maths' },
+    EVS:     { emoji: '🌱', color: 'from-yellow-400 to-orange-500', key: 'evs' },
+    Safety:  { emoji: '🛡️', color: 'from-red-400 to-pink-500', key: 'safety' },
+    Art:     { emoji: '🎨', color: 'from-fuchsia-400 to-purple-500', key: 'art' },
+  };
+  const meta = subjectMeta[subjectName] || subjectMeta.Hindi;
+  const subject = {
+    ...meta,
+    lessons: getLessonsBySubject(meta.key).slice(0, 10) as unknown as SimpleLesson[],
+  };
 
   const lessonEmojis: Record<string, string[]> = {
     Hindi: ['🔤', '✍️', '🅰️', '📝', '💬'],
@@ -343,6 +311,7 @@ function SubjectDetailPage({ onBack, onQuickAction, themeConfig }: { onBack: () 
   };
   const emojis = lessonEmojis[subjectName] || ['📘', '📘', '📘', '📘', '📘'];
   const [selectedLesson, setSelectedLesson] = useState<number | null>(null);
+  const [playingLesson, setPlayingLesson] = useState<number | null>(null);
 
   return (
     <div className="space-y-6">
@@ -371,7 +340,7 @@ function SubjectDetailPage({ onBack, onQuickAction, themeConfig }: { onBack: () 
         <h3 className="text-xl font-black text-gray-800">📚 Lessons</h3>
         {subject.lessons.map((lesson, index) => (
           <button
-            key={index}
+            key={lesson.id}
             type="button"
             onClick={() => {
               soundManager.click();
@@ -385,9 +354,11 @@ function SubjectDetailPage({ onBack, onQuickAction, themeConfig }: { onBack: () 
               </div>
               <div className="flex-1">
                 <h4 className="text-lg font-black text-gray-800 mb-1">{lesson.title}</h4>
-                <p className="text-sm text-gray-600 mb-2">{lesson.description}</p>
+                <p className="text-sm text-gray-600 mb-2">{lesson.explanation}</p>
                 <div className="flex items-center gap-2 text-xs text-gray-500">
-                  <span>⏱️ {lesson.duration}</span>
+                  <span>⏱️ {lesson.duration} min</span>
+                  <span>•</span>
+                  <span>❓ {lesson.questions.length} practice questions</span>
                   <span>•</span>
                   <span>📖 Interactive</span>
                 </div>
@@ -398,20 +369,35 @@ function SubjectDetailPage({ onBack, onQuickAction, themeConfig }: { onBack: () 
         ))}
       </div>
 
-      {/* Lesson Modal */}
+      {/* Lesson Preview Modal */}
       {selectedLesson !== null && subject.lessons[selectedLesson] && (
         <LessonModal
           lesson={{
-            ...subject.lessons[selectedLesson],
+            title: subject.lessons[selectedLesson].title,
+            description: subject.lessons[selectedLesson].explanation.slice(0, 110) + '…',
+            duration: `${subject.lessons[selectedLesson].duration} min`,
             emoji: emojis[selectedLesson] || '📘',
             points: [
-              subject.lessons[selectedLesson].description,
-              'Practice with fun interactive activities',
-              'Complete the exercises to earn stars ⭐',
+              ...subject.lessons[selectedLesson].activities.slice(0, 2),
+              `Answer ${subject.lessons[selectedLesson].questions.length} fun practice questions`,
+              'Earn stars ⭐ when you finish!',
             ],
           }}
           subjectColor={subject.color}
           onClose={() => setSelectedLesson(null)}
+          onStart={() => {
+            setPlayingLesson(selectedLesson);
+            setSelectedLesson(null);
+          }}
+        />
+      )}
+
+      {/* Full Interactive Lesson Player */}
+      {playingLesson !== null && subject.lessons[playingLesson] && (
+        <LessonPlayer
+          lesson={subject.lessons[playingLesson]}
+          subjectColor={subject.color}
+          onClose={() => setPlayingLesson(null)}
         />
       )}
 
