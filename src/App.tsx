@@ -15,6 +15,7 @@ import MathRaceGame from './components/MathRaceGame';
 import PatternGame from './components/PatternGame';
 import SpellingBeeGame from './components/SpellingBeeGame';
 import ThemeSwitcher from './components/ThemeSwitcher';
+import LessonModal from './components/LessonModal';
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { soundManager } from './utils/sounds';
 
@@ -106,7 +107,7 @@ function AppContent() {
         <PageTransition pageKey={page}>
           {page === 'home' && <HomePage onNavigate={handlePageChange} celebrate={celebrate} themeConfig={themeConfig} />}
           {page === 'subjects' && <SubjectsPage onNavigate={handlePageChange} themeConfig={themeConfig} />}
-          {page === 'subject-detail' && <SubjectDetailPage onBack={() => handlePageChange('subjects')} themeConfig={themeConfig} />}
+          {page === 'subject-detail' && <SubjectDetailPage onBack={() => handlePageChange('subjects')} onQuickAction={(p) => handlePageChange(p)} themeConfig={themeConfig} />}
           {page === 'quiz' && <QuizPage score={score} setScore={setScore} celebrate={celebrate} themeConfig={themeConfig} />}
           {page === 'flashcards' && <FlashcardsPage themeConfig={themeConfig} />}
           {page === 'tools' && <ToolsPage themeConfig={themeConfig} />}
@@ -282,7 +283,7 @@ function SubjectsPage({ onNavigate, themeConfig }: { onNavigate: (page: Page) =>
 }
 
 // Subject Detail Page
-function SubjectDetailPage({ onBack, themeConfig }: { onBack: () => void; themeConfig: any }) {
+function SubjectDetailPage({ onBack, onQuickAction, themeConfig }: { onBack: () => void; onQuickAction: (page: Page) => void; themeConfig: any }) {
   const subjectName = sessionStorage.getItem('selectedSubject') || 'Hindi';
   
   const subjectData: Record<string, { emoji: string; color: string; lessons: { title: string; description: string; duration: string }[] }> = {
@@ -334,13 +335,23 @@ function SubjectDetailPage({ onBack, themeConfig }: { onBack: () => void; themeC
 
   const subject = subjectData[subjectName] || subjectData.Hindi;
 
+  const lessonEmojis: Record<string, string[]> = {
+    Hindi: ['🔤', '✍️', '🅰️', '📝', '💬'],
+    English: ['🔠', '🔡', '🗣️', '👨‍👩‍👧', '🐘'],
+    Maths: ['🔢', '🔟', '➕', '➖', '🔺'],
+    EVS: ['🧍', '👀', '🌳', '🦁', '😊'],
+  };
+  const emojis = lessonEmojis[subjectName] || ['📘', '📘', '📘', '📘', '📘'];
+  const [selectedLesson, setSelectedLesson] = useState<number | null>(null);
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <button 
-          onClick={onBack}
-          className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-transform"
+        <button
+          onClick={() => { soundManager.click(); onBack(); }}
+          aria-label="Go back"
+          className="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center text-xl font-black cursor-pointer active:scale-95 transition-transform"
         >
           ←
         </button>
@@ -359,13 +370,14 @@ function SubjectDetailPage({ onBack, themeConfig }: { onBack: () => void; themeC
       <div className="space-y-4">
         <h3 className="text-xl font-black text-gray-800">📚 Lessons</h3>
         {subject.lessons.map((lesson, index) => (
-          <InteractiveCard
+          <button
             key={index}
+            type="button"
             onClick={() => {
               soundManager.click();
-              // Future: Navigate to lesson detail
+              setSelectedLesson(index);
             }}
-            className="bg-white rounded-2xl p-5 shadow-lg border-2 border-gray-100 hover:border-purple-300 cursor-pointer"
+            className="w-full text-left bg-white rounded-2xl p-5 shadow-lg border-2 border-gray-100 active:border-purple-300 active:scale-[0.99] transition-all cursor-pointer"
           >
             <div className="flex items-start gap-4">
               <div className={`w-12 h-12 bg-gradient-to-br ${subject.color} rounded-xl flex items-center justify-center text-white font-black text-lg`}>
@@ -382,34 +394,53 @@ function SubjectDetailPage({ onBack, themeConfig }: { onBack: () => void; themeC
               </div>
               <div className="text-2xl">→</div>
             </div>
-          </InteractiveCard>
+          </button>
         ))}
       </div>
+
+      {/* Lesson Modal */}
+      {selectedLesson !== null && subject.lessons[selectedLesson] && (
+        <LessonModal
+          lesson={{
+            ...subject.lessons[selectedLesson],
+            emoji: emojis[selectedLesson] || '📘',
+            points: [
+              subject.lessons[selectedLesson].description,
+              'Practice with fun interactive activities',
+              'Complete the exercises to earn stars ⭐',
+            ],
+          }}
+          subjectColor={subject.color}
+          onClose={() => setSelectedLesson(null)}
+        />
+      )}
 
       {/* Quick Actions */}
       <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-100">
         <h3 className="text-lg font-black text-gray-800 mb-4">🎯 Quick Practice</h3>
         <div className="grid grid-cols-2 gap-3">
-          <InteractiveCard
+          <button
+            type="button"
             onClick={() => {
               soundManager.click();
-              // Future: Open quiz for this subject
+              onQuickAction('quiz');
             }}
-            className="bg-white rounded-xl p-4 text-center shadow-md cursor-pointer"
+            className="bg-white rounded-xl p-4 text-center shadow-md cursor-pointer active:scale-95 transition-transform"
           >
             <div className="text-3xl mb-2">🎯</div>
             <div className="font-bold text-sm">Take Quiz</div>
-          </InteractiveCard>
-          <InteractiveCard
+          </button>
+          <button
+            type="button"
             onClick={() => {
               soundManager.click();
-              // Future: Open flashcards for this subject
+              onQuickAction('flashcards');
             }}
-            className="bg-white rounded-xl p-4 text-center shadow-md cursor-pointer"
+            className="bg-white rounded-xl p-4 text-center shadow-md cursor-pointer active:scale-95 transition-transform"
           >
             <div className="text-3xl mb-2">🎴</div>
             <div className="font-bold text-sm">Flashcards</div>
-          </InteractiveCard>
+          </button>
         </div>
       </div>
     </div>
