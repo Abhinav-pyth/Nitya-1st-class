@@ -36,6 +36,7 @@ export default function WordBuilderGame({ onBack }: WordBuilderGameProps) {
 
   const initializeLetters = () => {
     const extraLetters = ['X', 'Y', 'Z', 'Q', 'W'];
+    // Shuffle the letter tiles, then assign stable unique ids AFTER shuffling.
     const allLetters = [...currentWord.letters, ...extraLetters.slice(0, 2)]
       .sort(() => Math.random() - 0.5)
       .map((letter, index) => ({ letter, id: index, used: false }));
@@ -46,6 +47,7 @@ export default function WordBuilderGame({ onBack }: WordBuilderGameProps) {
   };
 
   const handleLetterClick = (id: number) => {
+    if (message) return; // ignore taps while showing correct/wrong feedback
     const letter = availableLetters.find(l => l.id === id);
     if (!letter || letter.used) return;
 
@@ -80,9 +82,7 @@ export default function WordBuilderGame({ onBack }: WordBuilderGameProps) {
         soundManager.wrong();
         setMessage('❌ Try again!');
         setTimeout(() => {
-          setSelectedLetters([]);
-          setAvailableLetters(prev => prev.map(l => ({ ...l, used: false })));
-          setMessage('');
+          initializeLetters();
         }, 1000);
       }
     }

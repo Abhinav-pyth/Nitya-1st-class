@@ -49,9 +49,9 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
     if (!isPlaying) setIsPlaying(true);
     soundManager.click();
 
-    const newCards = [...cards];
-    newCards[id].flipped = true;
-    setCards(newCards);
+    // Build the new state immutably so setTimeout callbacks never read stale arrays.
+    const updated = cards.map((c, i) => (i === id ? { ...c, flipped: true } : c));
+    setCards(updated);
 
     const newFlipped = [...flippedCards, id];
     setFlippedCards(newFlipped);
@@ -60,12 +60,12 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
       setMoves(m => m + 1);
       const [first, second] = newFlipped;
 
-      if (cards[first].emoji === cards[second].emoji) {
+      if (updated[first].emoji === updated[second].emoji) {
         soundManager.correct();
         setTimeout(() => {
-          const matched = [...cards];
-          matched[first].matched = true;
-          matched[second].matched = true;
+          const matched = updated.map((c, i) =>
+            i === first || i === second ? { ...c, matched: true } : c
+          );
           setCards(matched);
           setFlippedCards([]);
           const newMatches = matches + 1;
@@ -80,9 +80,9 @@ export default function MemoryGame({ onBack }: MemoryGameProps) {
       } else {
         soundManager.wrong();
         setTimeout(() => {
-          const reset = [...cards];
-          reset[first].flipped = false;
-          reset[second].flipped = false;
+          const reset = updated.map((c, i) =>
+            i === first || i === second ? { ...c, flipped: false } : c
+          );
           setCards(reset);
           setFlippedCards([]);
         }, 1000);

@@ -97,9 +97,6 @@ export default function SnakeLadderGame({ onBack }: SnakeLadderGameProps) {
     soundManager.click();
   };
 
-  // Generate board squares
-  const boardSquares = Array.from({ length: 100 }, (_, i) => i + 1);
-
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
@@ -118,33 +115,39 @@ export default function SnakeLadderGame({ onBack }: SnakeLadderGameProps) {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Game Board */}
-        <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-xl">
-          <div className="grid grid-cols-10 gap-1">
-            {boardSquares.map((num) => {
-              const isSnake = snakes[num];
-              const isLadder = ladders[num];
-              const isPlayer = position === num;
-              
-              return (
-                <div
-                  key={num}
-                  className={`aspect-square rounded-lg flex items-center justify-center text-xs font-bold relative ${
-                    isPlayer
-                      ? 'bg-yellow-400 text-white scale-110 shadow-lg z-10'
-                      : isSnake
-                      ? 'bg-red-100 text-red-700'
-                      : isLadder
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-50 text-gray-600'
-                  }`}
-                >
-                  <span className="text-[10px]">{num}</span>
-                  {isSnake && <span className="absolute top-0 right-0 text-[8px]">🐍</span>}
-                  {isLadder && <span className="absolute top-0 right-0 text-[8px]">🪜</span>}
-                  {isPlayer && <span className="absolute text-lg">🎲</span>}
-                </div>
-              );
-            })}
+        <div className="lg:col-span-2 bg-white rounded-2xl p-3 sm:p-6 shadow-xl">
+          <div className="grid grid-cols-10 gap-0.5 sm:gap-1 max-w-[min(92vw,540px)] mx-auto">
+            {Array.from({ length: 10 }, (_, row) => row).flatMap((row) =>
+              Array.from({ length: 10 }, (_, col) => {
+                // Boustrophedon layout: alternate rows run right-to-left so the
+                // board reads like a real snake & ladder (1 bottom-left, 100 top-left).
+                const leftToRight = row % 2 === 0;
+                const num = leftToRight ? row * 10 + col + 1 : row * 10 + (10 - col);
+                const isSnake = snakes[num];
+                const isLadder = ladders[num];
+                const isPlayer = position === num;
+
+                return (
+                  <div
+                    key={num}
+                    className={`aspect-square rounded-md sm:rounded-lg flex items-center justify-center text-[8px] sm:text-xs font-bold relative ${
+                      isPlayer
+                        ? 'bg-yellow-400 text-white scale-110 shadow-lg z-10'
+                        : isSnake
+                        ? 'bg-red-100 text-red-700'
+                        : isLadder
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-gray-50 text-gray-600'
+                    }`}
+                  >
+                    <span>{num}</span>
+                    {isSnake && <span className="absolute top-0 right-0 text-[7px] sm:text-[10px]">🐍</span>}
+                    {isLadder && <span className="absolute top-0 right-0 text-[7px] sm:text-[10px]">🪜</span>}
+                    {isPlayer && <span className="absolute text-sm sm:text-lg">🙂</span>}
+                  </div>
+                );
+              })
+            )}
           </div>
         </div>
 

@@ -27,47 +27,65 @@ export default function SpellingBeeGame({ onBack }: SpellingBeeGameProps) {
   const [showHint, setShowHint] = useState(false);
   const [gameComplete, setGameComplete] = useState(false);
   const [attempts, setAttempts] = useState(0);
+  const [advancing, setAdvancing] = useState(false);
 
   const currentWord = WORDS[currentWordIndex];
 
+  const resetGame = () => {
+    setCurrentWordIndex(0);
+    setScore(0);
+    setUserInput('');
+    setMessage('');
+    setShowHint(false);
+    setGameComplete(false);
+    setAttempts(0);
+    setAdvancing(false);
+  };
+
   const handleSubmit = () => {
-    if (!userInput.trim()) return;
+    if (advancing || !userInput.trim()) return;
 
     setAttempts(a => a + 1);
 
     if (userInput.toUpperCase() === currentWord.word) {
+      setAdvancing(true);
       soundManager.correct();
       setMessage('🎉 Perfect!');
       setScore(s => s + 10);
       confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
 
       setTimeout(() => {
-        if (currentWordIndex < WORDS.length - 1) {
+        const isLastWord = currentWordIndex >= WORDS.length - 1;
+        if (isLastWord) {
+          setGameComplete(true);
+          soundManager.celebrate();
+          confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+        } else {
           setCurrentWordIndex(i => i + 1);
           setUserInput('');
           setMessage('');
           setShowHint(false);
           setAttempts(0);
-        } else {
-          setGameComplete(true);
-          soundManager.celebrate();
-          confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
         }
+        setAdvancing(false);
       }, 1500);
     } else {
       soundManager.wrong();
       if (attempts >= 2) {
+        setAdvancing(true);
         setMessage(`❌ The answer is: ${currentWord.word}`);
         setTimeout(() => {
-          if (currentWordIndex < WORDS.length - 1) {
+          const isLastWord = currentWordIndex >= WORDS.length - 1;
+          if (isLastWord) {
+            setGameComplete(true);
+          } else {
             setCurrentWordIndex(i => i + 1);
             setUserInput('');
             setMessage('');
             setShowHint(false);
             setAttempts(0);
-          } else {
-            setGameComplete(true);
           }
+          setAdvancing(false);
         }, 2000);
       } else {
         setMessage('❌ Try again!');
@@ -84,20 +102,11 @@ export default function SpellingBeeGame({ onBack }: SpellingBeeGameProps) {
 
   const speakWord = () => {
     if ('speechSynthesis' in window) {
+      speechSynthesis.cancel(); // avoid overlapping speech on rapid taps
       const utterance = new SpeechSynthesisUtterance(currentWord.word);
       utterance.rate = 0.7;
       speechSynthesis.speak(utterance);
     }
-  };
-
-  const resetGame = () => {
-    setCurrentWordIndex(0);
-    setScore(0);
-    setUserInput('');
-    setMessage('');
-    setShowHint(false);
-    setGameComplete(false);
-    setAttempts(0);
   };
 
   if (gameComplete) {
