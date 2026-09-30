@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 
 export interface LessonInfo {
   title: string;
@@ -12,11 +12,10 @@ interface LessonModalProps {
   lesson: LessonInfo;
   subjectColor: string; // tailwind gradient e.g. "from-orange-400 to-red-500"
   onClose: () => void;
+  onStart?: () => void;
 }
 
-export default function LessonModal({ lesson, subjectColor, onClose }: LessonModalProps) {
-  const [started, setStarted] = useState(false);
-
+export default function LessonModal({ lesson, subjectColor, onClose, onStart }: LessonModalProps) {
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50"
@@ -49,40 +48,21 @@ export default function LessonModal({ lesson, subjectColor, onClose }: LessonMod
 
         {/* Body */}
         <div className="p-6">
-          {!started ? (
-            <>
-              <h4 className="font-black text-gray-800 mb-3">In this lesson you will learn:</h4>
-              <ul className="space-y-2 mb-6">
-                {lesson.points.map((p, i) => (
-                  <li key={i} className="flex items-start gap-2 text-gray-700">
-                    <span className="text-green-500 font-black">✓</span>
-                    <span>{p}</span>
-                  </li>
-                ))}
-              </ul>
-              <button
-                onClick={() => setStarted(true)}
-                className={`w-full py-4 rounded-2xl bg-gradient-to-r ${subjectColor} text-white font-black text-lg shadow-lg active:scale-95 transition-transform`}
-              >
-                ▶ Start Lesson
-              </button>
-            </>
-          ) : (
-            <div className="text-center py-6">
-              <div className="text-6xl mb-4">🎉</div>
-              <h4 className="text-xl font-black text-gray-800 mb-2">Lesson started!</h4>
-              <p className="text-gray-600 mb-6">
-                Great choice! The full interactive lesson for <b>{lesson.title}</b> is coming soon.
-                Meanwhile, try practicing with our games and flashcards!
-              </p>
-              <button
-                onClick={onClose}
-                className="px-8 py-3 rounded-2xl bg-purple-500 text-white font-black shadow-lg active:scale-95 transition-transform"
-              >
-                Back to Lessons
-              </button>
-            </div>
-          )}
+          <h4 className="font-black text-gray-800 mb-3">In this lesson you will learn:</h4>
+          <ul className="space-y-2 mb-6">
+            {lesson.points.map((p, i) => (
+              <li key={i} className="flex items-start gap-2 text-gray-700">
+                <span className="text-green-500 font-black">✓</span>
+                <span>{p}</span>
+              </li>
+            ))}
+          </ul>
+          <button
+            onClick={onStart ?? onClose}
+            className={`w-full py-4 rounded-2xl bg-gradient-to-r ${subjectColor} text-white font-black text-lg shadow-lg active:scale-95 transition-transform`}
+          >
+            ▶ Start Lesson
+          </button>
         </div>
       </div>
     </div>
