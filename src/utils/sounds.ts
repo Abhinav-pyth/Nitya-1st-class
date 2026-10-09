@@ -1,6 +1,14 @@
 // Sound utilities using Web Audio API
 class SoundManager {
   private audioContext: AudioContext | null = null;
+  private muted: boolean = typeof localStorage !== 'undefined' && localStorage.getItem('kb_muted') === '1';
+
+  isMuted() { return this.muted; }
+  setMuted(m: boolean) {
+    this.muted = m;
+    try { localStorage.setItem('kb_muted', m ? '1' : '0'); } catch {}
+  }
+  toggleMuted() { this.setMuted(!this.muted); return this.muted; }
 
   // Lazily create/resume the AudioContext. Browsers (especially mobile) block
   // audio until it is created or resumed from a user gesture — creating it in
@@ -8,6 +16,7 @@ class SoundManager {
   // sounds played at all.
   private ensureContext(): AudioContext | null {
     if (typeof window === 'undefined') return null;
+    if (this.muted) return null; // mute switch respected everywhere
     try {
       if (!this.audioContext) {
         const Ctx = window.AudioContext || (window as any).webkitAudioContext;
