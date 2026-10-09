@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://nitya-1st-class.vercel.app/sitemap.xml
+Sitemap: https://cbse-class-1st.vercel.app/sitemap.xml

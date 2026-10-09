@@ -191,7 +191,7 @@ export default function StoryRoom({ onBack }: { onBack: () => void }) {
 
       {phase === 'read' && (
         <>
-          <div className="bg-white rounded-3xl shadow-lg p-4 sm:p-5 space-y-3 max-h-[46vh] overflow-y-auto">
+          <div className="bg-white rounded-3xl shadow-lg p-4 sm:p-5 space-y-3 max-h-[46vh] overflow-y-auto overscroll-contain">
             {story.paragraphs.map((p, i) => (
               <p key={i} className={`text-base sm:text-lg leading-relaxed rounded-xl px-3 py-2 transition-colors ${highlight === i ? 'bg-yellow-100 ring-2 ring-yellow-300' : ''}`}
                 style={{ fontFamily: story.lang === 'hi-IN' ? "'Noto Sans Devanagari', sans-serif" : undefined }}>

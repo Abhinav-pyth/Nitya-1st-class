@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import useModalFocus from '../hooks/useModalFocus';
 import { Lesson } from '../types';
 import { speak } from '../utils/store';
 import { soundManager } from '../utils/sounds';
@@ -80,8 +81,17 @@ export default function LessonPlayer({ lesson, subjectColor, onClose, onComplete
   const stepIndex = ['learn', 'examples', 'practice', 'done'].indexOf(step);
   const stars = step === 'done' ? (correctCount === totalSteps ? 3 : correctCount >= totalSteps / 2 ? 2 : 1) : 0;
 
+  const overlayRef = useModalFocus(true, onClose);
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/60 overflow-y-auto" onClick={onClose} role="dialog" aria-modal="true">
+    <div
+      ref={overlayRef}
+      tabIndex={-1}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-4 bg-black/60 overflow-y-auto outline-none"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+    >
       <div
         className="bg-white rounded-3xl shadow-2xl w-full max-w-lg my-4 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
@@ -114,7 +124,7 @@ export default function LessonPlayer({ lesson, subjectColor, onClose, onComplete
         </div>
 
         {/* Body */}
-        <div className="p-4 sm:p-6 max-h-[60vh] overflow-y-auto">
+        <div className="p-4 sm:p-6 max-h-[60vh] overflow-y-auto overscroll-contain">
           {step === 'learn' && (
             <>
               <h4 className="font-black text-gray-800 mb-2 text-lg">📖 Let's Learn</h4>

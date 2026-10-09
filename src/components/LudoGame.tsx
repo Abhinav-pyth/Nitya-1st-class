@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import useModalFocus from '../hooks/useModalFocus';
 import { useTheme } from '../contexts/ThemeContext';
 import { soundManager } from '../utils/sounds';
 import confetti from 'canvas-confetti';
@@ -87,6 +88,7 @@ export default function LudoGame({ onBack }: LudoGameProps) {
   const [pendingMoves, setPendingMoves] = useState<Move[]>([]);
   const [message, setMessage] = useState('Red player, roll the dice! 🎲');
   const [winner, setWinner] = useState<PlayerColor | null>(null);
+  const winnerOverlayRef = useModalFocus(!!winner, resetGame);
 
   const colorBg: Record<PlayerColor, string> = {
     red: 'bg-red-500',
@@ -509,8 +511,8 @@ export default function LudoGame({ onBack }: LudoGameProps) {
 
       {/* Winner overlay */}
       {winner && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={resetGame}>
-          <div className={`bg-gradient-to-r ${colorBg[winner]} rounded-3xl p-8 text-white text-center shadow-2xl animate-pop-in max-w-sm w-full`}>
+        <div ref={winnerOverlayRef} tabIndex={-1} role="dialog" aria-modal="true" className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 outline-none" onClick={resetGame}>
+          <div className={`bg-gradient-to-r ${colorBg[winner]} rounded-3xl p-8 text-white text-center shadow-2xl animate-pop-in max-w-sm w-full`} onClick={(e) => e.stopPropagation()}>
             <div className="text-6xl mb-4">🏆</div>
             <h2 className="text-3xl font-black mb-2">{colorNames[winner]} Wins!</h2>
             <p className="mb-6 text-white/90">All four tokens made it home.</p>

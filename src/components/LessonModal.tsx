@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import useModalFocus from '../hooks/useModalFocus';
 
 export interface LessonInfo {
   title: string;
@@ -16,9 +16,12 @@ interface LessonModalProps {
 }
 
 export default function LessonModal({ lesson, subjectColor, onClose, onStart }: LessonModalProps) {
+  const overlayRef = useModalFocus(true, onClose);
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50"
+      ref={overlayRef}
+      tabIndex={-1}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 outline-none"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
@@ -46,8 +49,8 @@ export default function LessonModal({ lesson, subjectColor, onClose, onStart }: 
           </div>
         </div>
 
-        {/* Body */}
-        <div className="p-6">
+        {/* Body — scrolls internally on small screens instead of the page */}
+        <div className="p-6 max-h-[50vh] overflow-y-auto overscroll-contain">
           <h4 className="font-black text-gray-800 mb-3">In this lesson you will learn:</h4>
           <ul className="space-y-2 mb-6">
             {lesson.points.map((p, i) => (

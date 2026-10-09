@@ -29,7 +29,7 @@ export default function MagicCursor() {
       dot.style.opacity = `${opacity}`;
       dot.style.pointerEvents = 'none';
       dot.style.zIndex = '9999';
-      dot.style.transform = 'translate(-50%, -50%)';
+      // Centered via translate baked into the GSAP transform (xPercent/yPercent)
       dot.style.mixBlendMode = 'screen';
       dot.style.filter = 'blur(1px)';
       

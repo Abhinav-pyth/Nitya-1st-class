@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
+import useModalFocus from './hooks/useModalFocus';
 import InteractiveMascot from './components/InteractiveMascot';
 import ParticleBackground from './components/ParticleBackground';
 import MagicCursor from './components/MagicCursor';
@@ -29,6 +30,7 @@ function AppContent() {
   const [page, setPage] = useState<Page>('home');
   const [score, setScore] = useState(0);
   const [showThemeSwitcher, setShowThemeSwitcher] = useState(false);
+  const themeModalRef = useModalFocus(showThemeSwitcher, () => setShowThemeSwitcher(false));
 
   // Unlock Web Audio on the first user gesture (required by mobile browsers,
   // otherwise all game sounds stay silent).
@@ -92,8 +94,8 @@ function AppContent() {
 
       {/* Theme Switcher Modal */}
       {showThemeSwitcher && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setShowThemeSwitcher(false)}>
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4 outline-none" onClick={() => setShowThemeSwitcher(false)} role="dialog" aria-modal="true" ref={themeModalRef} tabIndex={-1}>
+          <div className="bg-white rounded-2xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto overscroll-contain" onClick={(e) => e.stopPropagation()}>
             <ThemeSwitcher />
             <button 
               onClick={() => setShowThemeSwitcher(false)}
