@@ -131,3 +131,94 @@ export const gkLessons: Lesson[] = [
 ];
 
 export const allGkLessons = gkLessons;
+
+// ===================== PRESCRIBED CORE GK (CBSE Class 1, 2026-27) =====================
+export const gkCoreLessons: Lesson[] = [
+  {
+    id: 'gk-c1', subject: 'gk', unit: 'Core GK', topic: 'Days of the Week', title: 'Days of the Week 📅', difficulty: 'easy', duration: 8,
+    explanation: 'A week has 7 days. They come in a fixed order every single week!',
+    examples: ['Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday', 'School days: Monday to Friday', 'Weekend: Saturday and Sunday'],
+    activities: ['Say the 7 days in order with me', 'Which day is today?', 'Put the days in the right order'],
+    questions: [
+      { id: 'gkc1q1', type: 'mcq', question: 'How many days are there in a week?', options: ['5', '7', '9'], answer: '7' },
+      { id: 'gkc1q2', type: 'mcq', question: 'Which is the FIRST day of the school week?', options: ['Sunday', 'Monday', 'Saturday'], answer: 'Monday' },
+      { id: 'gkc1q3', type: 'mcq', question: 'What comes after Wednesday?', options: ['Thursday', 'Tuesday', 'Friday'], answer: 'Thursday' },
+      { id: 'gkc1q4', type: 'mcq', question: 'Saturday and Sunday are called the...', options: ['School days', 'Weekend', 'Month'], answer: 'Weekend' },
+      { id: 'gkc1q5', type: 'mcq', question: 'What comes before Monday?', options: ['Tuesday', 'Friday', 'Sunday'], answer: 'Sunday' },
+    ],
+    prerequisites: [], parentGuide: ['Sing the days-of-the-week song together daily']
+  },
+  {
+    id: 'gk-c2', subject: 'gk', unit: 'Core GK', topic: 'Months of the Year', title: 'Months of the Year 🗓️', difficulty: 'easy', duration: 8,
+    explanation: 'A year has 12 months. January starts the year and December ends it.',
+    examples: ['January, February, March, April, May, June', 'July, August, September, October, November, December', 'Your birthday is in one of these months!'],
+    activities: ['Name the month you were born in', 'Put months in order', 'Find February on a calendar'],
+    questions: [
+      { id: 'gkc2q1', type: 'mcq', question: 'How many months are there in a year?', options: ['10', '12', '7'], answer: '12' },
+      { id: 'gkc2q2', type: 'mcq', question: 'Which is the FIRST month of the year?', options: ['December', 'January', 'June'], answer: 'January' },
+      { id: 'gkc2q3', type: 'mcq', question: 'Which month comes after August?', options: ['September', 'July', 'October'], answer: 'September' },
+      { id: 'gkc2q4', type: 'mcq', question: 'Which is the LAST month of the year?', options: ['November', 'January', 'December'], answer: 'December' },
+      { id: 'gkc2q5', type: 'mcq', question: 'February comes after which month?', options: ['March', 'January', 'April'], answer: 'January' },
+    ],
+    prerequisites: [], parentGuide: ['Point at a wall calendar each month']
+  },
+  {
+    id: 'gk-c3', subject: 'gk', unit: 'Core GK', topic: 'Colours', title: 'Colours Around Us 🌈', difficulty: 'easy', duration: 8,
+    explanation: 'The world is full of colours! We can name things by their colour.',
+    examples: ['Sky is blue', 'Sunflower is yellow', 'Leaf is green', 'Apple can be red'],
+    activities: ['Find 3 red things in the room', 'Match colour to object', 'Rainbow colours song'],
+    questions: [
+      { id: 'gkc3q1', type: 'mcq', question: 'What colour is a clear sky?', options: ['Green', 'Blue', 'Red'], answer: 'Blue' },
+      { id: 'gkc3q2', type: 'mcq', question: 'What colour is a ripe banana?', options: ['Yellow', 'Purple', 'Blue'], answer: 'Yellow' },
+      { id: 'gkc3q3', type: 'mcq', question: 'Leaves are usually what colour?', options: ['Orange', 'Green', 'Pink'], answer: 'Green' },
+      { id: 'gkc3q4', type: 'mcq', question: 'Snow is what colour?', options: ['Black', 'White', 'Brown'], answer: 'White' },
+      { id: 'gkc3q5', type: 'mcq', question: 'How many colours are in a rainbow?', options: ['5', '7', '10'], answer: '7' },
+    ],
+    prerequisites: [], parentGuide: ['Play I spy with my little eye using colours']
+  },
+  {
+    id: 'gk-c4', subject: 'gk', unit: 'Core GK', topic: 'Shapes', title: 'Everyday Shapes 🔺', difficulty: 'easy', duration: 8,
+    explanation: 'Shapes are everywhere! Circles, squares, triangles and rectangles make up the world around us.',
+    examples: ['Ball looks like a circle', 'Book is a rectangle', 'Sandwich cut is a triangle', 'Window frame is a square'],
+    activities: ['Find circle-shaped things at home', 'Sort shapes into groups', 'Draw one of each shape'],
+    questions: [
+      { id: 'gkc4q1', type: 'mcq', question: 'How many sides does a triangle have?', options: ['3', '4', '5'], answer: '3' },
+      { id: 'gkc4q2', type: 'mcq', question: 'A ball looks like which shape?', options: ['Square', 'Circle', 'Triangle'], answer: 'Circle' },
+      { id: 'gkc4q3', type: 'mcq', question: 'How many corners does a square have?', options: ['2', '4', '6'], answer: '4' },
+      { id: 'gkc4q4', type: 'mcq', question: 'Which shape has NO corners?', options: ['Square', 'Triangle', 'Circle'], answer: 'Circle' },
+      { id: 'gkc4q5', type: 'mcq', question: 'A ruler is shaped like a...', options: ['Rectangle', 'Circle', 'Triangle'], answer: 'Rectangle' },
+    ],
+    prerequisites: [], parentGuide: ['Connect to Maths Shapes and Objects unit']
+  },
+  {
+    id: 'gk-c5', subject: 'gk', unit: 'Core GK', topic: 'Indian Festivals', title: 'Festivals of India 🪔', difficulty: 'easy', duration: 10,
+    explanation: 'India celebrates many festivals together with joy. Diwali is the festival of lights, Holi is the festival of colours. Eid, Christmas, Gurpurab and Onam are also loved by all.',
+    examples: ['Diwali — lights, sweets, togetherness', 'Holi — colours and fun', 'Eid — prayers and feasting', 'Christmas — carols and giving', 'Onam — Kerala harvest festival'],
+    activities: ['Match festival to activity', 'Draw your favourite festival', 'Which festival do we celebrate at home?'],
+    questions: [
+      { id: 'gkc5q1', type: 'mcq', question: 'Which festival is known as the festival of LIGHTS?', options: ['Holi', 'Diwali', 'Onam'], answer: 'Diwali' },
+      { id: 'gkc5q2', type: 'mcq', question: 'We play with COLOURS on...', options: ['Holi', 'Christmas', 'Eid'], answer: 'Holi' },
+      { id: 'gkc5q3', type: 'mcq', question: 'Christmas is celebrated in the month of...', options: ['August', 'December', 'March'], answer: 'December' },
+      { id: 'gkc5q4', type: 'mcq', question: 'Onam is a famous festival of...', options: ['Kerala', 'Punjab', 'Bengal'], answer: 'Kerala' },
+      { id: 'gkc5q5', type: 'mcq', question: 'Gurpurab celebrates the birth day of...', options: ['Guru Nanak Ji', 'a king', 'a poet'], answer: 'Guru Nanak Ji' },
+    ],
+    prerequisites: [], parentGuide: ['Relate festivals to family traditions']
+  },
+  {
+    id: 'gk-c6', subject: 'gk', unit: 'Core GK', topic: 'Modes of Transport', title: 'Transport: Land, Water, Air 🚗', difficulty: 'easy', duration: 10,
+    explanation: 'We travel in different ways! Some vehicles go on land, some on water, and some fly in the air.',
+    examples: ['Land — car, bus, train, bicycle', 'Water — boat, ship', 'Air — aeroplane, helicopter'],
+    activities: ['Sort vehicle cards into land/water/air', 'Which transport do you use to school?', 'Make vehicle sounds together'],
+    questions: [
+      { id: 'gkc6q1', type: 'mcq', question: 'Which one travels ON WATER?', options: ['Bus', 'Boat', 'Train'], answer: 'Boat' },
+      { id: 'gkc6q2', type: 'mcq', question: 'An aeroplane flies in the...', options: ['Air', 'Sea', 'Road'], answer: 'Air' },
+      { id: 'gkc6q3', type: 'mcq', question: 'Which is a LAND vehicle?', options: ['Ship', 'Helicopter', 'Bicycle'], answer: 'Bicycle' },
+      { id: 'gkc6q4', type: 'mcq', question: 'A train runs on...', options: ['Tracks', 'Clouds', 'Water'], answer: 'Tracks' },
+      { id: 'gkc6q5', type: 'mcq', question: 'Which is the FASTEST way to travel far away?', options: ['Bicycle', 'Aeroplane', 'Boat'], answer: 'Aeroplane' },
+    ],
+    prerequisites: [], parentGuide: ['Connect to EVS Transport lessons']
+  },
+];
+
+import { gkEnrichmentLessons } from './gkEnrichment';
+export const allGkLessonsFull = [...gkLessons, ...gkCoreLessons, ...gkEnrichmentLessons];
