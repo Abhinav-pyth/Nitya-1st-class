@@ -3,9 +3,9 @@ import { allHindiLessons } from '../data/hindi';
 import { allEnglishLessons } from '../data/english';
 import { allMathsLessons } from '../data/maths';
 import { allEvsLessons } from '../data/evs';
-import { allGkLessons } from '../data/gk';
+import { allGkLessonsFull } from '../data/gk';
 
-export const ALL_LESSONS = [...allHindiLessons, ...allEnglishLessons, ...allMathsLessons, ...allEvsLessons, ...allGkLessons];
+export const ALL_LESSONS = [...allHindiLessons, ...allEnglishLessons, ...allMathsLessons, ...allEvsLessons, ...allGkLessonsFull];
 
 const STORAGE_KEY = 'class1_learning_buddy';
 
@@ -104,7 +104,7 @@ export const getLessonsBySubject = (subject: Subject) => {
     case 'evs': return allEvsLessons.filter(l => l.subject === 'evs');
     case 'safety': return allEvsLessons.filter(l => l.subject === 'safety');
     case 'art': return allEvsLessons.filter(l => l.subject === 'art');
-    case 'gk': return allGkLessons;
+    case 'gk': return allGkLessonsFull;
     default: return [];
   }
 };
