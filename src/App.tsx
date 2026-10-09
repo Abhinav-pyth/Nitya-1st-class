@@ -14,6 +14,7 @@ import WordBuilderGame from './components/WordBuilderGame';
 import MathRaceGame from './components/MathRaceGame';
 import PatternGame from './components/PatternGame';
 import SpellingBeeGame from './components/SpellingBeeGame';
+import BlockPuzzleGame from './components/BlockPuzzleGame';
 import ThemeSwitcher from './components/ThemeSwitcher';
 import LessonModal from './components/LessonModal';
 import LessonPlayer, { SimpleLesson } from './components/LessonPlayer';
@@ -21,7 +22,7 @@ import { getLessonsBySubject } from "./utils/store";
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { soundManager } from './utils/sounds';
 
-type Page = 'home' | 'subjects' | 'subject-detail' | 'quiz' | 'flashcards' | 'tools' | 'games' | 'snake-ladder' | 'ludo' | 'memory' | 'word-builder' | 'math-race' | 'pattern' | 'spelling';
+type Page = 'home' | 'subjects' | 'subject-detail' | 'quiz' | 'flashcards' | 'tools' | 'games' | 'snake-ladder' | 'ludo' | 'memory' | 'word-builder' | 'math-race' | 'pattern' | 'spelling' | 'block-puzzle';
 
 function AppContent() {
   const { themeConfig } = useTheme();
@@ -121,6 +122,7 @@ function AppContent() {
           {page === 'math-race' && <MathRaceGame onBack={() => handlePageChange('games')} />}
           {page === 'pattern' && <PatternGame onBack={() => handlePageChange('games')} />}
           {page === 'spelling' && <SpellingBeeGame onBack={() => handlePageChange('games')} />}
+          {page === 'block-puzzle' && <BlockPuzzleGame onBack={() => handlePageChange('games')} />}
         </PageTransition>
       </main>
 
@@ -615,6 +617,15 @@ function GamesPage({ onNavigate, themeConfig }: { onNavigate: (page: Page) => vo
       gradient: 'from-cyan-400 to-blue-600',
       tags: ['📚 Learning', '🔊 Audio'],
       category: 'Educational',
+    },
+    {
+      id: 'block-puzzle',
+      title: 'Block Puzzle',
+      emoji: '🧱',
+      description: 'Place colorful blocks and clear full rows & columns!',
+      gradient: 'from-indigo-400 to-purple-600',
+      tags: ['🧩 Puzzle', '👤 1 Player'],
+      category: 'Brain',
     },
   ];
 

@@ -74,7 +74,7 @@ export interface Weakness {
   priority: number;
 }
 
-export type Subject = 'hindi' | 'english' | 'maths' | 'evs' | 'safety' | 'art';
+export type Subject = 'hindi' | 'english' | 'maths' | 'evs' | 'safety' | 'art' | 'gk';
 
 export type Page = 'home' | 'daily' | 'subjects' | 'lesson' | 'quiz' | 'progress' | 'settings' | 'hindi-write' | 'child-mode' | 'weekly-report' | 'foundation' | 'speak' | 'vocabulary' | 'matra' | 'classroom' | 'classroom-stream' | 'classroom-classwork' | 'classroom-people' | 'games';
 
