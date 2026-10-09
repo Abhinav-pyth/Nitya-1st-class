@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 const DIST = path.resolve('dist');
-const ORIGIN = 'https://nitya-1st-class.vercel.app';
+const ORIGIN = 'https://cbse-class-1st.vercel.app';
 
 const raw = fs.readFileSync(path.resolve('src/data/seoContent.ts'), 'utf8')
   .replace(/export interface[\s\S]*?\n}\n/, '')
