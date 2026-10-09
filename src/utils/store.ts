@@ -3,6 +3,9 @@ import { allHindiLessons } from '../data/hindi';
 import { allEnglishLessons } from '../data/english';
 import { allMathsLessons } from '../data/maths';
 import { allEvsLessons } from '../data/evs';
+import { allGkLessons } from '../data/gk';
+
+export const ALL_LESSONS = [...allHindiLessons, ...allEnglishLessons, ...allMathsLessons, ...allEvsLessons, ...allGkLessons];
 
 const STORAGE_KEY = 'class1_learning_buddy';
 
@@ -101,6 +104,7 @@ export const getLessonsBySubject = (subject: Subject) => {
     case 'evs': return allEvsLessons.filter(l => l.subject === 'evs');
     case 'safety': return allEvsLessons.filter(l => l.subject === 'safety');
     case 'art': return allEvsLessons.filter(l => l.subject === 'art');
+    case 'gk': return allGkLessons;
     default: return [];
   }
 };
@@ -110,7 +114,7 @@ export const getWeaknesses = (state: AppState): Weakness[] => {
   
   Object.entries(state.progress).forEach(([topicId, progress]) => {
     if (progress.score < 70) {
-      const lesson = [...allHindiLessons, ...allEnglishLessons, ...allMathsLessons, ...allEvsLessons]
+      const lesson = ALL_LESSONS
         .find(l => l.id === topicId);
       if (lesson) {
         weaknesses.push({
@@ -241,7 +245,7 @@ export const generateDailyPlan = (state: AppState): DailyPlan => {
 
 export const generateQuiz = (state: AppState): import('../types').QuizQuestion[] => {
   const questions: import('../types').QuizQuestion[] = [];
-  const allLessons = [...allHindiLessons, ...allEnglishLessons, ...allMathsLessons, ...allEvsLessons];
+  const allLessons = ALL_LESSONS;
   
   // Pick from areas that need practice
   const practicedTopics = Object.keys(state.progress).filter(id => state.progress[id].score < 85);
